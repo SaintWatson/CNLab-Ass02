@@ -31,9 +31,24 @@ app.get('/nat', (req, res) => {
     });
 })
 
-app.get('/block', (req, res)=>{
-	
+app.get('block', (req, res)=>{
+    res.send(`
+        <html>
+            <form action="blocking" method="post">
+                block: <input type="text" name="block" />
+                </br>
+                <button>GO!</button>
+            </form>
+        </html>`
+    );
 })
+
+app.post('blocking', (req, res)=>{
+    let ip = req.body.name
+    spawn("iptables", [ "-t", "nat", "-I", "PREROUTING", "1", "-s", ip, "-j", "DROP"]);
+    spawn("iptables", [ "-t", "nat", "-I", "PREROUTING", "1", "-d", ip, "-j", "DROP"]);
+})
+
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
